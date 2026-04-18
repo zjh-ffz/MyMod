@@ -53,6 +53,14 @@ jar {
             "Implementation-Vendor": "example.com"
         ])
     }
+
+    // 将 BouncyCastle OpenPGP 运行时依赖打包到 mod JAR 中，避免运行时缺少类
+    from {
+        configurations.runtimeClasspath.filter {
+            it.name.contains('bcprov') || it.name.contains('bcpg')
+        }.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 publishing {
