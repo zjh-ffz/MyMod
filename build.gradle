@@ -1,0 +1,53 @@
+plugins {
+    id 'net.minecraftforge.gradle' version '6.0.18'
+    id 'org.jetbrains.kotlin.jvm' version '1.9.22'
+    id 'maven-publish'
+}
+
+version = '1.0.0'
+group = 'com.example.mymod'   // 实际会被脚本替换
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+minecraft {
+    mappings channel: 'official', version: '1.20.1'
+    runs {
+        client {
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,LOADING'
+            property 'forge.logging.console.level', 'debug'
+            mods { mymod { source sourceSets.main } }
+        }
+        server {
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,LOADING'
+            property 'forge.logging.console.level', 'debug'
+            mods { mymod { source sourceSets.main } }
+        }
+    }
+}
+
+dependencies {
+    minecraft 'net.minecraftforge:forge:1.20.1-47.3.0'
+    implementation 'org.bouncycastle:bcprov-jdk15on:1.73'
+    implementation 'org.bouncycastle:bcpg-jdk15on:1.73'
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+}
+
+jar {
+    manifest {
+        attributes([
+            "Specification-Title": "mymod",
+            "Specification-Vendor": "example.com",
+            "Specification-Version": "1",
+            "Implementation-Title": project.name,
+            "Implementation-Version": project.version,
+            "Implementation-Vendor": "example.com"
+        ])
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
