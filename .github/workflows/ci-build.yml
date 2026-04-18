@@ -44,7 +44,7 @@ jobs:
           GPG_PRIVATE_KEY_BASE64: ${{ secrets.GPG_PRIVATE_KEY_BASE64 }}
 
       - name: Build Mod (with tests)
-        run: ./gradlew build --no-daemon
+        run: ./gradlew build --no-daemon --no-configuration-cache
 
       - name: Sign JAR with GPG
         if: ${{ env.GPG_PRIVATE_KEY_BASE64 != '' }}
