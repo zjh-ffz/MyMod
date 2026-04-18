@@ -36,6 +36,7 @@ jobs:
           cache-encryption-key: ${{ secrets.GRADLE_CACHE_KEY }}
 
       - name: Import GPG key
+        if: ${{ env.GPG_PRIVATE_KEY_BASE64 != '' }}
         run: |
           export GNUPGHOME=$(mktemp -d)
           echo "$GPG_PRIVATE_KEY_BASE64" | base64 --decode | gpg --batch --import
@@ -46,6 +47,7 @@ jobs:
         run: ./gradlew build --no-daemon
 
       - name: Sign JAR with GPG
+        if: ${{ env.GPG_PRIVATE_KEY_BASE64 != '' }}
         run: |
           export GNUPGHOME=$(mktemp -d)
           echo "$GPG_PRIVATE_KEY_BASE64" | base64 --decode | gpg --batch --import
