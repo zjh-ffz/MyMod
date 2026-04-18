@@ -58,9 +58,9 @@ jobs:
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
 
       - name: Upload Artifact
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: mymod-${{ env.MOD_VERSION }}-${{ env.FORGE_VERSION }}-signed
+          name: mymod-${{ env.MOD_VERSION }}
           path: |
-            build/libs/mymod-${{ env.MOD_VERSION }}-${{ env.FORGE_VERSION }}.jar
-            build/libs/mymod-${{ env.MOD_VERSION }}-${{ env.FORGE_VERSION }}.jar.asc
+            build/libs/mymod-${{ env.MOD_VERSION }}.jar
