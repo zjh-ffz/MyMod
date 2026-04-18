@@ -27,9 +27,14 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: 'temurin'
+          cache: 'gradle'  # 启用Gradle缓存
 
+      # 修复点：替换已过时的gradle-build-action为官方推荐的setup-gradle
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v3
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          cache-read-only: false  # 启用缓存读写
+          cache-encryption-key: ${{ secrets.GRADLE_CACHE_KEY }}  # 可选：缓存加密密钥
 
       - name: Build Mod (with tests)
         run: ./gradlew build --no-daemon
