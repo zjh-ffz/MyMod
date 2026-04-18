@@ -27,33 +27,38 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: 'temurin'
-          cache: 'gradle'  # 启用Gradle缓存
+          cache: 'gradle'
 
-      # 修复点：替换已过时的gradle-build-action为官方推荐的setup-gradle
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
-          cache-read-only: false  # 启用缓存读写
-          cache-encryption-key: ${{ secrets.GRADLE_CACHE_KEY }}  # 可选：缓存加密密钥
+          cache-read-only: false
+          cache-encryption-key: ${{ secrets.GRADLE_CACHE_KEY }}
+
+      - name: Import GPG key
+        run: |
+          export GNUPGHOME=$(mktemp -d)
+          echo "$GPG_PRIVATE_KEY_BASE64" | base64 --decode | gpg --batch --import
+        env:
+          GPG_PRIVATE_KEY_BASE64: ${{ secrets.GPG_PRIVATE_KEY_BASE64 }}
 
       - name: Build Mod (with tests)
         run: ./gradlew build --no-daemon
 
-      - name: Verify JAR integrity
+      - name: Sign JAR with GPG
         run: |
-          jar -tf build/libs/mymod-${{ env.MOD_VERSION }}-${{ env.FORGE_VERSION }}.jar | head -20
-
-      - name: Sign JAR (for CurseForge)
-        run: |
-          echo "$KEYSTORE_BASE64" | base64 -d > mymod.keystore
-          jarsigner -keystore mymod.keystore -storepass changeit \
-                    -keypass changeit \
-                    build/libs/mymod-${{ env.MOD_VERSION }}-${{ env.FORGE_VERSION }}.jar mymod
+          export GNUPGHOME=$(mktemp -d)
+          echo "$GPG_PRIVATE_KEY_BASE64" | base64 --decode | gpg --batch --import
+          gpg --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" \
+            --detach-sign --armor build/libs/mymod-${{ env.MOD_VERSION }}-${{ env.FORGE_VERSION }}.jar
         env:
-          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }} # ⚠️ 请在 GitHub Secrets 中预存 base64 编码的 keystore
+          GPG_PRIVATE_KEY_BASE64: ${{ secrets.GPG_PRIVATE_KEY_BASE64 }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: mymod-${{ env.MOD_VERSION }}-${{ env.FORGE_VERSION }}-signed.jar
-          path: build/libs/mymod-${{ env.MOD_VERSION }}-${{ env.FORGE_VERSION }}.jar
+          name: mymod-${{ env.MOD_VERSION }}-${{ env.FORGE_VERSION }}-signed
+          path: |
+            build/libs/mymod-${{ env.MOD_VERSION }}-${{ env.FORGE_VERSION }}.jar
+            build/libs/mymod-${{ env.MOD_VERSION }}-${{ env.FORGE_VERSION }}.jar.asc

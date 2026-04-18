@@ -41,6 +41,7 @@ plugins {
     id 'net.minecraftforge.gradle' version '6.0.18'
     id 'org.jetbrains.kotlin.jvm' version '1.9.22'
     id 'maven-publish'
+    id 'signing'
 }
 
 version = '1.0.0'
@@ -85,6 +86,20 @@ jar {
             "Implementation-Vendor": "example.com"
         ])
     }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            artifactId = project.name
+        }
+    }
+}
+
+signing {
+    useGpgCmd()
+    sign publishing.publications.mavenJava
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -195,12 +210,29 @@ jobs:
         with:
           java-version: 17
           distribution: 'temurin'
+      - name: Import GPG key
+        run: |
+          export GNUPGHOME=$(mktemp -d)
+          echo "$GPG_PRIVATE_KEY_BASE64" | base64 --decode | gpg --batch --import
+        env:
+          GPG_PRIVATE_KEY_BASE64: ${{ secrets.GPG_PRIVATE_KEY_BASE64 }}
       - name: Build with Gradle
         run: ./gradlew build --no-daemon
+      - name: Sign JAR with GPG
+        run: |
+          export GNUPGHOME=$(mktemp -d)
+          echo "$GPG_PRIVATE_KEY_BASE64" | base64 --decode | gpg --batch --import
+          gpg --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" \
+            --detach-sign --armor build/libs/${MOD_NAME}-1.0.0.jar
+        env:
+          GPG_PRIVATE_KEY_BASE64: ${{ secrets.GPG_PRIVATE_KEY_BASE64 }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
       - uses: actions/upload-artifact@v4
         with:
-          name: ${MOD_NAME}-1.0.0.jar
-          path: build/libs/*.jar
+          name: ${MOD_NAME}-1.0.0-signed
+          path: |
+            build/libs/${MOD_NAME}-1.0.0.jar
+            build/libs/${MOD_NAME}-1.0.0.jar.asc
 EOF
 sed -i "s/\${MOD_NAME}/${MOD_NAME}/g" "$ROOT_DIR/.github/workflows/ci-build.yml"
 

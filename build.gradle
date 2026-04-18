@@ -2,6 +2,13 @@ plugins {
     id 'net.minecraftforge.gradle' version '6.0.18'
     id 'org.jetbrains.kotlin.jvm' version '1.9.22'
     id 'maven-publish'
+    id 'signing'
+}
+
+repositories {
+    mavenCentral()
+    maven { url 'https://maven.minecraftforge.net/' }
+    maven { url 'https://repo.spongepowered.org/repository/maven-public/' }
 }
 
 version = '1.0.0'
@@ -28,8 +35,8 @@ minecraft {
 
 dependencies {
     minecraft 'net.minecraftforge:forge:1.20.1-47.3.0'
-    implementation 'org.bouncycastle:bcprov-jdk15on:1.73'
-    implementation 'org.bouncycastle:bcpg-jdk15on:1.73'
+    implementation 'org.bouncycastle:bcprov-jdk15on:1.70'
+    implementation 'org.bouncycastle:bcpg-jdk15on:1.70'
     compileOnly 'org.projectlombok:lombok:1.18.30'
     annotationProcessor 'org.projectlombok:lombok:1.18.30'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
@@ -46,6 +53,20 @@ jar {
             "Implementation-Vendor": "example.com"
         ])
     }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            artifactId = project.name
+        }
+    }
+}
+
+signing {
+    useGpgCmd()
+    sign publishing.publications.mavenJava
 }
 
 tasks.withType(JavaCompile).configureEach {

@@ -1,0 +1,10 @@
+{
+  "item.mymod.pgp_tool": "OpenPGP Tool",
+  "command.mymod.pgp.description": "Generate keys, encrypt, decrypt, sign, and verify using OpenPGP.",
+  "command.mymod.pgp.genkey.description": "Generate an OpenPGP key pair.",
+  "command.mymod.pgp.encrypt.description": "Encrypt a message with the current PGP public key.",
+  "command.mymod.pgp.decrypt.description": "Decrypt an armored PGP message with the current private key.",
+  "command.mymod.pgp.sign.description": "Sign a message with the current PGP private key.",
+  "command.mymod.pgp.verify.description": "Verify a signed message with the current PGP public key.",
+  "command.mymod.pgp.gui.description": "Open the OpenPGP GUI panel."
+}

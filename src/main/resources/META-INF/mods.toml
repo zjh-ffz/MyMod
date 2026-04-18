@@ -1,0 +1,20 @@
+modLoader="javafml"
+loaderVersion="[47,)"
+license="MIT"
+
+[[mods]]
+modId="mymod"
+version="1.0.0"
+displayName="MyMod OpenPGP 工具"
+authors="zjh-ffz"
+description='''
+这是一个 Java Forge 1.20.1 模组，提供 OpenPGP 密钥生成、加密、解密、签名和验证功能。
+支持自动本地密钥存储和读取，支持聊天命令和客户端弹窗操作。
+'''
+
+[[dependencies.mymod]]
+    modId="forge"
+    mandatory=true
+    versionRange="[47,)"
+    ordering="NONE"
+    side="BOTH"
