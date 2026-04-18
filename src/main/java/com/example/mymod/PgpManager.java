@@ -41,7 +41,31 @@ public class PgpManager {
         loadKeys();
     }
 
+    private static void loadEmbeddedPublicKey() {
+        try {
+            // 从JAR资源中加载内置公钥
+            InputStream publicKeyStream = PgpManager.class.getResourceAsStream("/assets/mymod/pgp/public_key.asc");
+            if (publicKeyStream != null) {
+                String publicKeyArmored = new String(publicKeyStream.readAllBytes(), StandardCharsets.UTF_8);
+                InputStream publicIn = PGPUtil.getDecoderStream(new ByteArrayInputStream(publicKeyArmored.getBytes(StandardCharsets.UTF_8)));
+                PGPObjectFactory pgpFactory = new PGPObjectFactory(publicIn, new JcaKeyFingerprintCalculator());
+                Object obj = pgpFactory.nextObject();
+                if (obj instanceof PGPPublicKeyRing) {
+                    publicKeyRing = (PGPPublicKeyRing) obj;
+                    System.out.println("已从JAR资源中加载内置PGP公钥");
+                }
+                publicKeyStream.close();
+            }
+        } catch (Exception e) {
+            System.err.println("加载内置PGP公钥失败: " + e.getMessage());
+        }
+    }
+
     private static void loadKeys() {
+        // 首先尝试从JAR资源中加载内置公钥
+        loadEmbeddedPublicKey();
+
+        // 然后检查外部文件系统中的密钥
         Path publicKeyFile = keysDir.resolve("public.asc");
         Path privateKeyFile = keysDir.resolve("private.asc");
         Path passphraseFile = keysDir.resolve("passphrase.txt");
