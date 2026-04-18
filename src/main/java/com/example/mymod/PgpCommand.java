@@ -44,14 +44,14 @@ public class PgpCommand {
             return 0;
         }
         Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(new PgpScreen()));
-        source.sendSuccess(Component.literal("[PGP] 已打开 OpenPGP 操作窗口。"), false);
+        source.sendSuccess(() -> Component.literal("[PGP] 已打开 OpenPGP 操作窗口。"), false);
         return 1;
     }
 
     private static int executeGenerateKey(CommandSourceStack source, String identity, String passphrase) {
         try {
             String publicKey = PgpManager.generateKeyPair(identity, passphrase);
-            source.sendSuccess(Component.literal("[PGP] 密钥对已生成。使用 /pgp export public 查看公钥。"), false);
+            source.sendSuccess(() -> Component.literal("[PGP] 密钥对已生成。使用 /pgp export public 查看公钥。"), false);
             return 1;
         } catch (Exception e) {
             source.sendFailure(Component.literal("[PGP] 生成失败: " + e.getMessage()));
@@ -62,7 +62,7 @@ public class PgpCommand {
     private static int executeExportPublic(CommandSourceStack source) {
         try {
             String publicKey = PgpManager.exportPublicKey();
-            source.sendSuccess(Component.literal("[PGP] 公钥:\n" + publicKey), false);
+            source.sendSuccess(() -> Component.literal("[PGP] 公钥:\n" + publicKey), false);
             return 1;
         } catch (Exception e) {
             source.sendFailure(Component.literal("[PGP] 导出公钥失败: " + e.getMessage()));
@@ -73,7 +73,7 @@ public class PgpCommand {
     private static int executeExportPrivate(CommandSourceStack source) {
         try {
             String privateKey = PgpManager.exportPrivateKey();
-            source.sendSuccess(Component.literal("[PGP] 私钥:\n" + privateKey), false);
+            source.sendSuccess(() -> Component.literal("[PGP] 私钥:\n" + privateKey), false);
             return 1;
         } catch (Exception e) {
             source.sendFailure(Component.literal("[PGP] 导出私钥失败: " + e.getMessage()));
@@ -84,7 +84,7 @@ public class PgpCommand {
     private static int executeEncrypt(CommandSourceStack source, String message) {
         try {
             String encrypted = PgpManager.encrypt(message);
-            source.sendSuccess(Component.literal("[PGP] 加密结果:\n" + encrypted), false);
+            source.sendSuccess(() -> Component.literal("[PGP] 加密结果:\n" + encrypted), false);
             return 1;
         } catch (Exception e) {
             source.sendFailure(Component.literal("[PGP] 加密失败: " + e.getMessage()));
@@ -95,7 +95,7 @@ public class PgpCommand {
     private static int executeDecrypt(CommandSourceStack source, String ciphertext) {
         try {
             String decrypted = PgpManager.decrypt(ciphertext);
-            source.sendSuccess(Component.literal("[PGP] 解密结果:\n" + decrypted), false);
+            source.sendSuccess(() -> Component.literal("[PGP] 解密结果:\n" + decrypted), false);
             return 1;
         } catch (Exception e) {
             source.sendFailure(Component.literal("[PGP] 解密失败: " + e.getMessage()));
@@ -106,7 +106,7 @@ public class PgpCommand {
     private static int executeSign(CommandSourceStack source, String message) {
         try {
             String signature = PgpManager.sign(message);
-            source.sendSuccess(Component.literal("[PGP] 签名结果:\n" + signature), false);
+            source.sendSuccess(() -> Component.literal("[PGP] 签名结果:\n" + signature), false);
             return 1;
         } catch (Exception e) {
             source.sendFailure(Component.literal("[PGP] 签名失败: " + e.getMessage()));
@@ -122,7 +122,7 @@ public class PgpCommand {
                 return 0;
             }
             boolean valid = PgpManager.verify(parts[0], parts[1]);
-            source.sendSuccess(Component.literal("[PGP] 签名验证: " + (valid ? "有效" : "无效")), false);
+            source.sendSuccess(() -> Component.literal("[PGP] 签名验证: " + (valid ? "有效" : "无效")), false);
             return valid ? 1 : 0;
         } catch (Exception e) {
             source.sendFailure(Component.literal("[PGP] 验证失败: " + e.getMessage()));

@@ -6,6 +6,7 @@ import org.bouncycastle.bcpg.PublicKeyAlgorithmTags;
 import org.bouncycastle.bcpg.SymmetricKeyAlgorithmTags;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openpgp.*;
+import org.bouncycastle.openpgp.operator.PGPDigestCalculator;
 import org.bouncycastle.openpgp.operator.jcajce.*;
 
 import java.io.*;
@@ -184,11 +185,11 @@ public class PgpManager {
                     .setProvider(BouncyCastleProvider.PROVIDER_NAME));
 
             try (OutputStream encOut = encGen.open(armoredOut, messageBytes.length)) {
-                try (PGPLiteralDataGenerator literal = new PGPLiteralDataGenerator()) {
-                    try (OutputStream pOut = literal.open(encOut, PGPLiteralData.BINARY, "message", messageBytes.length, new Date())) {
-                        pOut.write(messageBytes);
-                    }
+                PGPLiteralDataGenerator literal = new PGPLiteralDataGenerator();
+                try (OutputStream pOut = literal.open(encOut, PGPLiteralData.BINARY, "message", messageBytes.length, new Date())) {
+                    pOut.write(messageBytes);
                 }
+                literal.close();
             }
         }
         return out.toString(StandardCharsets.UTF_8);
@@ -208,19 +209,22 @@ public class PgpManager {
             encryptedDataList = (PGPEncryptedDataList) pgpFactory.nextObject();
         }
 
-        Iterator<PGPPublicKeyEncryptedData> it = encryptedDataList.getEncryptedDataObjects();
+        Iterator<?> it = encryptedDataList.getEncryptedDataObjects();
         PGPPrivateKey privateKey = null;
         PGPPublicKeyEncryptedData encryptedData = null;
         while (it.hasNext()) {
-            PGPPublicKeyEncryptedData pked = it.next();
-            PGPSecretKey secretKey = secretKeyRing.getSecretKey(pked.getKeyID());
-            if (secretKey != null) {
-                privateKey = secretKey.extractPrivateKey(new JcePBESecretKeyDecryptorBuilder(
-                        new JcaPGPDigestCalculatorProviderBuilder().build())
-                        .setProvider(BouncyCastleProvider.PROVIDER_NAME)
-                        .build(privateKeyPassphrase));
-                encryptedData = pked;
-                break;
+            Object obj = it.next();
+            if (obj instanceof PGPPublicKeyEncryptedData) {
+                PGPPublicKeyEncryptedData pked = (PGPPublicKeyEncryptedData) obj;
+                PGPSecretKey secretKey = secretKeyRing.getSecretKey(pked.getKeyID());
+                if (secretKey != null) {
+                    privateKey = secretKey.extractPrivateKey(new JcePBESecretKeyDecryptorBuilder(
+                            new JcaPGPDigestCalculatorProviderBuilder().build())
+                            .setProvider(BouncyCastleProvider.PROVIDER_NAME)
+                            .build(privateKeyPassphrase));
+                    encryptedData = pked;
+                    break;
+                }
             }
         }
         if (privateKey == null || encryptedData == null) {
