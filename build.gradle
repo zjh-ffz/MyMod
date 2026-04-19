@@ -14,7 +14,22 @@ plugins {
 
 version = '1.0.0'
 group = 'com.example.mymod'   // 实际会被脚本替换
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.release.set(17)
+}
+
+kotlin {
+    jvmToolchain(17)
+}
 
 sourceSets {
     main {
@@ -50,7 +65,7 @@ tasks.named('processResources', Copy) {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.20.1-47.3.0'
+    minecraft 'net.minecraftforge:forge:1.20.1-47.4.1'
     implementation 'org.bouncycastle:bcprov-jdk15on:1.70'
     implementation 'org.bouncycastle:bcpg-jdk15on:1.70'
     compileOnly 'org.projectlombok:lombok:1.18.30'
