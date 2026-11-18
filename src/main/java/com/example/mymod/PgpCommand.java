@@ -112,7 +112,8 @@ public class PgpCommand {
 
     private static int executeExportPublic(CommandSourceStack source) {
         try {
-            source.sendSuccess(() -> Component.literal("[PGP] 公钥:\n" + PgpManager.exportPublicKey()), false);
+            String publicKey = PgpManager.exportPublicKey();
+            source.sendSuccess(() -> Component.literal("[PGP] 公钥:\n" + publicKey), false);
             return 1;
         } catch (Exception e) {
             source.sendFailure(Component.literal("[PGP] 导出公钥失败: " + e.getMessage()));
@@ -122,7 +123,8 @@ public class PgpCommand {
 
     private static int executeExportPrivate(CommandSourceStack source) {
         try {
-            source.sendSuccess(() -> Component.literal("[PGP] 私钥:\n" + PgpManager.exportPrivateKey()), false);
+            String privateKey = PgpManager.exportPrivateKey();
+            source.sendSuccess(() -> Component.literal("[PGP] 私钥:\n" + privateKey), false);
             return 1;
         } catch (Exception e) {
             source.sendFailure(Component.literal("[PGP] 导出私钥失败: " + e.getMessage()));
