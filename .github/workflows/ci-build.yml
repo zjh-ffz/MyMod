@@ -14,7 +14,7 @@ on:
 env:
   JAVA_VERSION: 17
   FORGE_VERSION: 1.20.1-47.3.0
-  MOD_VERSION: 1.0.0
+  MOD_VERSION: 1.1.0
 
 jobs:
   build:

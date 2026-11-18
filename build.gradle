@@ -12,7 +12,7 @@ plugins {
 //     maven { url 'https://repo.spongepowered.org/repository/maven-public/' }
 // }
 
-version = '1.0.0'
+version = '1.1.0'
 group = 'com.example.mymod'   // 实际会被脚本替换
 
 java {
