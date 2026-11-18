@@ -4,12 +4,13 @@ license="MIT"
 
 [[mods]]
 modId="mymod"
-version="1.0.0"
+version="1.1.0"
 displayName="MyMod OpenPGP 工具"
 authors="zjh-ffz"
 description='''
 这是一个 Java Forge 1.20.1 模组，提供 OpenPGP 密钥生成、加密、解密、签名和验证功能。
-支持自动本地密钥存储和读取，支持聊天命令和客户端弹窗操作。
+支持本地密钥存储、加密口令保管、文件加解密（可自动删除 .gpg 源文件）、
+聊天栏/界面进度条，以及从可配置的 OpenPGP 密钥服务器联网下载公钥。
 '''
 
 [[dependencies.mymod]]
