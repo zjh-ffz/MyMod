@@ -7,6 +7,8 @@ import net.minecraft.client.gui.components.Checkbox;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
+import net.minecraft.util.FormattedCharSequence;
 
 public class PgpScreen extends Screen {
 
@@ -36,13 +38,12 @@ public class PgpScreen extends Screen {
         this.addRenderableWidget(identityBox);
 
         passphraseBox = new EditBox(this.font, left, top + 26, 310, 20, Component.literal("口令"));
-        passphraseBox.setFormatter((text, cursor) -> Component.literal("*".repeat(text.length())));
+        passphraseBox.setFormatter((text, cursor) ->
+                FormattedCharSequence.forward("*".repeat(text.length()), Style.EMPTY));
         this.addRenderableWidget(passphraseBox);
 
-        rememberBox = Checkbox.builder(Component.literal("记住口令（加密保存）"), this.font)
-                .pos(left, top + 50)
-                .selected(PgpConfig.rememberPassphrase())
-                .build();
+        rememberBox = new Checkbox(left, top + 50, 20, 20,
+                Component.literal("记住口令（加密保存）"), PgpConfig.rememberPassphrase());
         this.addRenderableWidget(rememberBox);
 
         this.addRenderableWidget(Button.builder(Component.literal("生成密钥"), button -> runWithProgress(
